@@ -145,7 +145,7 @@ function uc_varprice_product_class_submit($form, &$form_state) {
     config_set('uc_varprice.settings', 'class_definitions.' . $form_state['values']['pcid'], $data);
   }
   else {
-    config_clear('uc_product.settings', 'class_definitions.' . $form_state['values']['pcid']);
+    config_clear('uc_varprice.settings', 'class_definitions.' . $form_state['values']['pcid']);
   }
 }
 
