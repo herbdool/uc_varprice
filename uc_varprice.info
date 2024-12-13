@@ -1,8 +1,6 @@
 name = Variable Price
 description = Defines a product feature to turn any product into a variable priced product.
-dependencies[] = uc_cart
-dependencies[] = uc_product
-dependencies[] = uc_store
+dependencies[] = ubercart
 package = Ubercart - extra
 backdrop = 1.x
 type = module
