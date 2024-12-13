@@ -1,5 +1,4 @@
 <?php
-// $Id: uc_varprice.install,v 1.1 2009/05/15 21:40:04 rszrama Exp $
 
 /**
  * @file
@@ -76,7 +75,6 @@ function uc_varprice_uninstall() {
   db_delete('uc_product_features')
     ->condition('fid', 'varprice')
     ->execute();
-  config_clear('uc_varprice.settings', 'uc_varprice_global_default');
 }
 
 /**
@@ -91,8 +89,18 @@ function uc_varprice_update_1000() {
 }
 
 /**
- * Implements hook_install().
+ * Convert product class defaults to config.
  */
-function uc_varprice_install() {
-  // Dynamically generated variable data was detected.
+function uc_varprice_update_1001() {
+  foreach (node_type_get_names() as $type => $name) {
+    $config = config('uc_varprice.settings');
+    $data = update_variable_get('ucvp_class_def_' . $type);
+    if (!empty($data)) {
+      $data = unserialize($data);
+    }
+    $config->set('class_definitions.' . $type, $data);
+    $config->save();
+
+    update_variable_del('ucvp_class_def_' . $type);
+  }
 }

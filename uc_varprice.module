@@ -62,6 +62,7 @@ function uc_varprice_form_alter(&$form, &$form_state, $form_id) {
       }
 
       // Add the amount textfield to the add to cart form.
+      $config_store = config('uc_store.settings');
 
       $form['varprice'] = array(
         '#type' => 'textfield',
@@ -70,8 +71,8 @@ function uc_varprice_form_alter(&$form, &$form_state, $form_id) {
         '#default_value' => $data ? $data->price_default : config_get('uc_varprice.settings', 'uc_varprice_global_default'),
         '#size' => 8,
         '#weight' => -5,
-        '#field_prefix' => variable_get('uc_sign_after_amount', FALSE) ? '' : variable_get('uc_currency_sign', '$'),
-        '#field_suffix' => variable_get('uc_sign_after_amount', FALSE)?variable_get('uc_currency_sign', '$') : '',
+        '#field_prefix' => $config_store->get('uc_sign_after_amount') ? '' : $config_store->get('uc_currency_sign'),
+        '#field_suffix' => $config_store->get('uc_sign_after_amount') ?$config_store->get('uc_currency_sign') : '',
       );
 
       if (!empty($data->add_to_cart_title)) {
@@ -100,10 +101,9 @@ function uc_varprice_form_alter(&$form, &$form_state, $form_id) {
 
     $data = FALSE;
     if (!empty($form['pcid']['#value'])) {
-      // TODO This variable was probably removed in Backdrop without replacement.
-      $class_defaults = variable_get('ucvp_class_def_' . $form['pcid']['#value'], array());
+      $class_defaults = config_get('uc_varprice.settings', 'class_definitions.' . $form['pcid']['#value']);
       if (!empty($class_defaults)) {
-        $data = (object) unserialize($class_defaults);
+        $data = (object) $class_defaults;
       }
     }
 
@@ -142,15 +142,16 @@ function uc_varprice_product_class_submit($form, &$form_state) {
       'amount_title' => $form_state['values']['override_amount_title'] ? $form_state['values']['amount_title'] : '',
     );
 
-    variable_set('ucvp_class_def_' . $form_state['values']['pcid'], serialize($data));
+    config_set('uc_varprice.settings', 'class_definitions.' . $form_state['values']['pcid'], $data);
   }
   else {
-    variable_del('ucvp_class_def_' . $form_state['values']['pcid']);
+    config_clear('uc_varprice.settings', 'class_definitions.' . $form_state['values']['pcid']);
   }
 }
 
 /**
  * Implements hook_node_view().
+ *
  * Summary of alterations:
  * 1) Removes price displays from variable priced product nodes.
  * 2) Inserts Variable Price product feature on product node creation.
@@ -171,12 +172,11 @@ function uc_varprice_node_view($node, $view_mode = 'full') {
  */
 function uc_varprice_node_insert($node) {
   if (uc_product_is_product($node)) {
-    $data = variable_get('ucvp_class_def_' . $node->type, array());
+    $data = config_get('uc_varprice.settings', 'class_definitions.' . $node->type);
 
     // If the product class has a default Variable Price product feature...
     if ($data) {
       // Prepare the data as if it were from a form submission.
-      $data = unserialize($data);
       $data['nid'] = $node->nid;
       $data['pfid'] = '';
       $form_state = array('values' => $data);
@@ -265,14 +265,16 @@ function uc_varprice_uc_product_feature() {
 function uc_varprice_settings() {
   $form = array();
 
+  $config_store = config('uc_store.settings');
+
   $form['uc_varprice_global_default'] = array(
     '#title' => t('Global default price'),
     '#type' => 'textfield',
     '#size' => 8,
     '#description' => t('The global default price for variable priced products; may be overridden at the product class or product level.'),
     '#default_value' => config_get('uc_varprice.settings', 'uc_varprice_global_default'),
-    '#field_prefix' => variable_get('uc_sign_after_amount', FALSE) ? '' : variable_get('uc_currency_sign', '$'),
-    '#field_suffix' => variable_get('uc_sign_after_amount', FALSE)?variable_get('uc_currency_sign', '$') : '',
+    '#field_prefix' => $config_store->get('uc_sign_after_amount') ? '' : $config_store->get('uc_currency_sign'),
+        '#field_suffix' => $config_store->get('uc_sign_after_amount') ?$config_store->get('uc_currency_sign') : '',
   );
 
   return $form;
@@ -313,6 +315,11 @@ function uc_varprice_feature_form($form, &$form_state, $node, $feature) {
   return $form;
 }
 
+/**
+ * Feature form
+ *
+ * @param object|false $varprice_feature
+ */
 function _uc_varprice_feature_form($varprice_feature = FALSE) {
   $form = array();
 
@@ -321,14 +328,16 @@ function _uc_varprice_feature_form($varprice_feature = FALSE) {
     '#title' => t('Price settings'),
   );
 
+  $config_store = config('uc_store.settings');
+
   $form['prices']['price_default'] = array(
     '#type' => 'textfield',
     '#title' => t('Default price'),
     '#size' => 8,
     '#description' => t('The default price for this variable priced products.'),
     '#default_value' => $varprice_feature ? $varprice_feature->price_default : config_get('uc_varprice.settings', 'uc_varprice_global_default'),
-    '#field_prefix' => variable_get('uc_sign_after_amount', FALSE) ? '' : variable_get('uc_currency_sign', '$'),
-    '#field_suffix' => variable_get('uc_sign_after_amount', FALSE)?variable_get('uc_currency_sign', '$') : '',
+    '#field_prefix' => $config_store->get('uc_sign_after_amount') ? '' : $config_store->get('uc_currency_sign'),
+    '#field_suffix' => $config_store->get('uc_sign_after_amount') ?$config_store->get('uc_currency_sign') : '',
   );
 
   $form['prices']['price_minimum'] = array(
@@ -337,8 +346,8 @@ function _uc_varprice_feature_form($varprice_feature = FALSE) {
     '#size' => 8,
     '#description' => t('The minimum price required for this product to be added to the cart.<br />Leave blank for no minimum.'),
     '#default_value' => $varprice_feature ? $varprice_feature->price_minimum : '',
-    '#field_prefix' => variable_get('uc_sign_after_amount', FALSE) ? '' : variable_get('uc_currency_sign', '$'),
-    '#field_suffix' => variable_get('uc_sign_after_amount', FALSE)?variable_get('uc_currency_sign', '$') : '',
+    '#field_prefix' => $config_store->get('uc_sign_after_amount') ? '' : $config_store->get('uc_currency_sign'),
+    '#field_suffix' => $config_store->get('uc_sign_after_amount') ?$config_store->get('uc_currency_sign') : '',
   );
 
   $form['prices']['price_maximum'] = array(
@@ -347,8 +356,8 @@ function _uc_varprice_feature_form($varprice_feature = FALSE) {
     '#size' => 8,
     '#description' => t('The maximum price allowed for this product to be added to the cart.<br />Leave blank for no maximum.'),
     '#default_value' => $varprice_feature ? $varprice_feature->price_maximum : '',
-    '#field_prefix' => variable_get('uc_sign_after_amount', FALSE) ? '' : variable_get('uc_currency_sign', '$'),
-    '#field_suffix' => variable_get('uc_sign_after_amount', FALSE)?variable_get('uc_currency_sign', '$') : '',
+    '#field_prefix' => $config_store->get('uc_sign_after_amount') ? '' : $config_store->get('uc_currency_sign'),
+    '#field_suffix' => $config_store->get('uc_sign_after_amount') ?$config_store->get('uc_currency_sign') : '',
   );
 
   $form['titles'] = array(
@@ -440,6 +449,8 @@ function uc_varprice_feature_form_submit($form, &$form_state) {
 
 /**
  * Variable Price product feature delete function.
+ *
+ * @param array $feature
  */
 function uc_varprice_feature_delete($feature) {
   db_delete('uc_varprice_products')
@@ -447,10 +458,12 @@ function uc_varprice_feature_delete($feature) {
     ->execute();
 }
 
-// Load the product feature data for a given node.
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Load the product feature data for a given node.
+ *
+ * @param int $nid
+ *
+ * @return DatabaseStatementInterface
  */
 function uc_varprice_product_load($nid) {
   return db_query('SELECT vp.* FROM {uc_product_features} AS pf
@@ -461,6 +474,10 @@ function uc_varprice_product_load($nid) {
 
 /**
  * Theme the Qty. field for products in the shopping cart with variable prices.
+ *
+ * @param array $variables
+ *
+ * @return string
  */
 function theme_varprice_qty($variables) {
   $element = $variables['form'];
@@ -469,6 +486,10 @@ function theme_varprice_qty($variables) {
 
 /**
  * Gets a uc_varprice id from a product feature id.
+ *
+ * @param int $pfid
+ *
+ * @return DatabaseStatementInterface
  */
 function _uc_varprice_get_vpid($pfid) {
   return db_query('SELECT vpid FROM {uc_varprice_products} WHERE pfid = :pfid', array(':pfid' => $pfid))->fetchField();
