@@ -453,9 +453,14 @@ function uc_varprice_feature_form_submit($form, &$form_state) {
  * @param array $feature
  */
 function uc_varprice_feature_delete($feature) {
-  db_delete('uc_varprice_products')
-    ->condition('pfid', $feature['pfid'])
-    ->execute();
+  if (is_array($feature) && isset($feature['pfid'])) {
+    db_delete('uc_varprice_products')
+      ->condition('pfid', $feature['pfid'])
+      ->execute();
+  }
+  else {
+    watchdog('uc_varprice', 'Invalid data passed to uc_varprice_feature_delete(). Expected array with key "pfid".', array(), WATCHDOG_ERROR);
+  }
 }
 
 /**
