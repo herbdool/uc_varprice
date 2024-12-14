@@ -1,7 +1,5 @@
 # UC Variable Price Module
 
-Please, be careful. This module is still a bit buggy. Report errors and we'll do our best to help resolve them.
-
 The **UC Variable Price** module allows you to enable variable pricing for any product in your Ubercart store. Instead of a fixed price set by an administrator, customers can specify their own price when adding a product to the cart. This makes the module especially useful for donation-based websites or pay-what-you-want stores.
 
 ## Key Features
@@ -15,6 +13,7 @@ Once enabled, the module updates the product’s add-to-cart form to include a p
 
 ## Documentation
 ### Adding Variable Pricing to a Product
+You will first need to create and save your product, before you can configure this in "Features" tab. 
 1. **Edit the Product:** Navigate to the product’s **Edit** page in your store.
 2. **Enable the Feature:** Go to the **Features** tab and add the **Variable Price** feature.
 3. **Configure Prices:** Set optional minimum and maximum price limits.
