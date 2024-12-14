@@ -1,6 +1,8 @@
 #  UC Variable Price
 
-The UC Variable Price product feature allows you to turn any product in your Ubercart store into a variable priced product. Instead of using a fixed price entered by an administrator, customers can specify their own price for a product on the add to cart form. This makes it a useful module for donation sites! The module will automatically take care of the product add to cart shopping cart forms to accommodate the variable price field. It affords you some measure of control over the titles of various fields and also lets you specify a minimum and maximum price for any given product. Extra integration with Ubercart's product classes interface allows you to set default Variable Price product features on every product created of any given product class.
+The UC Variable Price product feature allows you to turn any product in your Ubercart store into a variable priced product. Instead of using a fixed price entered by an administrator, customers can specify their own price for a product on the add to cart form. This makes it a useful module for donation sites! 
+
+The module will automatically take care of the product add to cart shopping cart forms to accommodate the variable price field. It affords you some measure of control over the titles of various fields and also lets you specify a minimum and maximum price for any given product. Extra integration with Ubercart's product classes interface allows you to set default Variable Price product features on every product created of any given product class.
 
 ## Documentation
 
