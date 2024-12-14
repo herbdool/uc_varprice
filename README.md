@@ -14,8 +14,12 @@ Once enabled, the module updates the product’s add-to-cart form to include a p
 ## Documentation
 ### Adding Variable Pricing to a Product
 You will first need to create and save your product, before you can configure this in "Features" tab. 
-1. **Edit the Product:** Navigate to the product’s **Edit** page in your store.
+1. **Edit the Product:** Navigate to the product’s **Edit** page in your store. `/admin/store/products/view`
 2. **Enable the Feature:** Go to the **Features** tab and add the **Variable Price** feature.
+![image](https://github.com/user-attachments/assets/3b988e32-6e71-4d80-9e7b-33afdf8252d2)
+![image](https://github.com/user-attachments/assets/0cadd56b-79e6-4726-aa68-07adfe035135)
+
+
 3. **Configure Prices:** Set optional minimum and maximum price limits.
 4. **Save the Product.**
 
